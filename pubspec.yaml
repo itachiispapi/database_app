@@ -1,5 +1,5 @@
 name: flutter_database
-description: sqlite demo with CRUD buttons
+description: sqflite demo with CRUD buttons
 publish_to: "none"
 
 environment:
