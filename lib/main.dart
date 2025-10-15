@@ -46,9 +46,24 @@ class MyHomePage extends StatelessWidget {
     );
   }
 
-  // will update later
-  static void _insert() async {}
-  static void _query() async {}
+  static void _insert() async {
+    final row = {
+      DatabaseHelper.columnName: 'Anakin Skywalker',
+      DatabaseHelper.columnAge: 23,
+    };
+    final id = await dbHelper.insert(row);
+    debugPrint('inserted row id: $id');
+  }
+
+  static void _query() async {
+    final allRows = await dbHelper.queryAllRows();
+    debugPrint('query all rows:');
+    for (final row in allRows) {
+      debugPrint(row.toString());
+    }
+  }
+
+// will update later
   static void _update() async {}
   static void _delete() async {}
 }
