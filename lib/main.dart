@@ -11,37 +11,94 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SQFlite Demo',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
-      home: const MyHomePage(),
+      title: 'Database Demo',
+      theme: ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: Colors.teal,
+        brightness: Brightness.light,
+      ),
+      home: const HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  static const double buttonSpacing = 16;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('sqflite')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton(onPressed: _insert, child: const Text('insert')),
-            const SizedBox(height: 10),
-            ElevatedButton(onPressed: _query, child: const Text('query')),
-            const SizedBox(height: 10),
-            ElevatedButton(onPressed: _update, child: const Text('update')),
-            const SizedBox(height: 10),
-            ElevatedButton(onPressed: _delete, child: const Text('delete')),
-          ],
+      appBar: AppBar(
+        title: const Text('SQLite CRUD Demo'
+            , style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
         ),
+        backgroundColor: Colors.transparent,
+        foregroundColor: const Color.fromARGB(255, 121, 54, 255),
+        centerTitle: true,
+        elevation: 0,
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF9FACE6), Color(0xFF74EBD5)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: Card(
+            elevation: 10,
+            color: const Color.fromARGB(165, 255, 255, 255),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            margin: const EdgeInsets.symmetric(horizontal: 32, vertical: 80),
+            child: Padding(
+              padding: const EdgeInsets.all(28.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 20),
+                  _buildButton(context, 'Insert', const Color.fromARGB(255, 121, 54, 255), _insert),
+                  const SizedBox(height: buttonSpacing),
+                  _buildButton(context, 'Query', const Color.fromARGB(255, 113, 129, 236), _query),
+                  const SizedBox(height: buttonSpacing),
+                  _buildButton(context, 'Update', const Color.fromARGB(255, 142, 197, 255), _update),
+                  const SizedBox(height: buttonSpacing),
+                  _buildButton(context, 'Delete', const Color.fromARGB(255, 145, 228, 254), _delete),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  static Widget _buildButton(
+      BuildContext context, String label, Color color, Function() onTap) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          elevation: 5,
+        ),
+        onPressed: onTap,
+        child: Text(label),
       ),
     );
   }
@@ -52,18 +109,30 @@ class MyHomePage extends StatelessWidget {
       DatabaseHelper.columnAge: 23,
     };
     final id = await dbHelper.insert(row);
-    debugPrint('inserted row id: $id');
+    debugPrint('Inserted row id: $id');
   }
 
   static void _query() async {
-    final allRows = await dbHelper.queryAllRows();
-    debugPrint('query all rows:');
-    for (final row in allRows) {
+    final rows = await dbHelper.queryAllRows();
+    debugPrint('All rows:');
+    for (final row in rows) {
       debugPrint(row.toString());
     }
   }
 
-// will update later
-  static void _update() async {}
-  static void _delete() async {}
+  static void _update() async {
+    final row = {
+      DatabaseHelper.columnId: 1,
+      DatabaseHelper.columnName: 'Padme Amidala',
+      DatabaseHelper.columnAge: 32,
+    };
+    final updated = await dbHelper.update(row);
+    debugPrint('Updated $updated row(s)');
+  }
+
+  static void _delete() async {
+    final id = await dbHelper.queryRowCount();
+    final deleted = await dbHelper.delete(id);
+    debugPrint('Deleted $deleted row(s) with id $id');
+  }
 }
